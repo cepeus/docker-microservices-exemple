@@ -1,0 +1,48 @@
+version: "3.5"
+services:
+  proxy:
+    build: ./nginx
+    ports:
+    - "80:80"
+    networks:
+      services_network:
+        aliases:
+        - api.local
+    depends_on:
+    - nginx-one
+    - nginx-two
+  nginx-one:
+    container_name: nginx-one
+    build: ./services/one/nginx
+    networks:
+      services_network:
+        aliases:
+        - one-service.docker
+    depends_on:
+    - php-one
+  php-one:
+    container_name: php-one
+    build: ./services/one/php-fpm
+    networks:
+      services_network:
+    volumes:
+    - ../../dev/app-one:/var/www/html
+  nginx-two:
+    container_name: nginx-two
+    build: ./services/one/nginx
+    networks:
+      services_network:
+        aliases:
+        - two-service.docker
+    depends_on:
+    - php-two
+  php-two:
+    container_name: php-two
+    build: ./services/two/php-fpm
+    networks:
+      services_network:
+    volumes:
+    - ../../dev/app-two:/var/www/html
+networks:
+  services_network:
+    name: services_network
